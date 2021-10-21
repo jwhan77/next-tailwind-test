@@ -5,7 +5,7 @@ import ToggleSwitch from "./ToogleSwitch";
 const Navbar = () => {
   const [darkMode, setDarkMode] = useState(false);
 
-  const [session, loading] = useSession();
+  const [session] = useSession();
 
   useEffect(() => {
     function setupMode() {
@@ -45,7 +45,7 @@ const Navbar = () => {
         <div className="flex items-center justify-center text-black dark:text-white">
           {!session && (
             <>
-              <button onClick={() => signIn()}>Sign in</button>
+              <button onClick={() => signIn("github")}>Sign in</button>
             </>
           )}
           {session && (

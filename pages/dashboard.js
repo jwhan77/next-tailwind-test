@@ -1,15 +1,12 @@
 import { useSession } from "next-auth/client";
-import Link from "next/link";
 
-export default function Home() {
+export default function Dashboard() {
   const [session] = useSession();
 
   if (session) {
     return (
       <>
-        <Link href="/dashboard">
-          <a>Open Dashboard</a>
-        </Link>
+        <button>Dashboard page</button>
       </>
     );
   }
