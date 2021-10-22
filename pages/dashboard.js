@@ -1,28 +1,32 @@
 import { useSession } from "next-auth/client";
 import { useState } from "react";
 
+import Grid from "../components/Grid";
+
 export default function Dashboard() {
   const [session] = useSession();
 
-  const [projects, setProjects] = useState([]);
+  const [repos, setRepos] = useState([]);
 
-  const fetchProjects = async () => {
-    const response = await fetch("/api/projects");
+  const fetchRepos = async () => {
+    const response = await fetch("/api/repos");
     const data = await response.json();
-    setProjects(data);
+    setRepos(data);
   };
 
   if (session) {
     return (
       <>
-        <button onClick={fetchProjects}>Load projects</button>
-        {projects.map((project) => {
+        <button onClick={fetchRepos}>Load repos</button>
+        {repos.map((repo) => {
           return (
-            <div key={project.id}>
-              {project.id}: {project.name}
+            <div key={repo.id}>
+              {repo.id}: {repo.name}
             </div>
           );
         })}
+
+        <Grid />
       </>
     );
   }
