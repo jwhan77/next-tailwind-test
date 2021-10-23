@@ -6,10 +6,10 @@ import Grid from "../components/Grid";
 const Dashboard = () => {
   const [session] = useSession();
 
-  const [repos, setRepos] = useState([]);
   const [myRepos, setMyRepos] = useState([]);
 
   const [loadReposModalIsOpen, setLoadReposModalIsOpen] = useState(false);
+  const [repos, setRepos] = useState([]);
   const [checkedRepos, setCheckedRepos] = useState([]);
 
   const closeLoadReposModal = () => {
@@ -22,7 +22,6 @@ const Dashboard = () => {
       const response = await fetch("/api/repos");
       const data = await response.json();
       setRepos(data);
-      console.log(data);
     };
 
     fetchRepos();
@@ -50,14 +49,23 @@ const Dashboard = () => {
     let newCheckedReposObj = repos.filter((repo) =>
       checkedRepos.includes(repo.id.toString())
     );
-    console.log(newCheckedReposObj);
     let newMyRepos = [...myRepos, ...newCheckedReposObj];
-    console.log(newMyRepos);
 
     setMyRepos(newMyRepos);
     setTimeout(() => {
       closeLoadReposModal();
     }, 500);
+  };
+
+  const checkRepoIsInMyRepos = (targetRepo) => {
+    let inMyRepos = false;
+    for (let repo of myRepos) {
+      if (targetRepo.id === repo.id) {
+        inMyRepos = true;
+        break;
+      }
+    }
+    return !inMyRepos;
   };
 
   if (session) {
@@ -84,21 +92,23 @@ const Dashboard = () => {
               <h2>Repos in GitHub</h2>
               <button onClick={closeLoadReposModal}>close</button>
               <form onSubmit={handleLoadReposSubmit}>
-                {repos.map((repo) => {
-                  return (
-                    <div key={repo.id}>
-                      <label>
-                        <input
-                          name={repo.name}
-                          value={repo.id}
-                          type="checkbox"
-                          onChange={handleCheckRepoChange}
-                        ></input>
-                        {repo.name}
-                      </label>
-                    </div>
-                  );
-                })}
+                {repos
+                  .filter((repo) => checkRepoIsInMyRepos(repo))
+                  .map((repo) => {
+                    return (
+                      <div key={repo.id}>
+                        <label>
+                          <input
+                            name={repo.name}
+                            value={repo.id}
+                            type="checkbox"
+                            onChange={handleCheckRepoChange}
+                          ></input>
+                          {repo.name}
+                        </label>
+                      </div>
+                    );
+                  })}
                 <input type="submit" value="Submit" />
               </form>
             </Modal>
