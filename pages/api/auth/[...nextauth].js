@@ -9,7 +9,7 @@ export default NextAuth({
     Providers.GitHub({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
-      scope: "user repo",
+      scope: "read:user user:email repo",
     }),
   ],
   callbacks: {
