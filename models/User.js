@@ -3,6 +3,7 @@ import Adapters from "next-auth/adapters";
 export default class User extends Adapters.TypeORM.Models.User.model {
   constructor(name, email, image, emailVerified) {
     super(name, email, image, emailVerified);
+    this.myRepos = [];
   }
 }
 

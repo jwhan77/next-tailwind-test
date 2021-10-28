@@ -1,38 +1,37 @@
 const mongoose = require("mongoose");
-const { ObjectId } = require("mongodb");
 const Schema = mongoose.Schema;
 
 const accountSchema = new Schema(
   {
     _id: {
-      type: ObjectId,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     compoundId: {
-      type: String,
+      type: Schema.Types.String,
       required: true,
     },
     userId: {
-      type: ObjectId,
+      type: Schema.Types.Mixed,
       required: true,
     },
     providerType: {
-      type: String,
+      type: Schema.Types.String,
       required: true,
     },
     providerId: {
-      type: String,
+      type: Schema.Types.String,
       required: true,
     },
     providerAccountId: {
-      type: Number,
+      type: Schema.Types.Number,
       required: true,
     },
     refreshToken: {
       required: false,
     },
     accessToken: {
-      type: String,
+      type: Schema.Types.String,
       required: true,
     },
     accessTokenExpires: {

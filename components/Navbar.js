@@ -50,7 +50,7 @@ const Navbar = () => {
           )}
           {session && (
             <>
-              <span>{session.user.name}</span>
+              <span>{session.user && session.user.name}</span>
               <button onClick={() => signOut()}>Sign out</button>
             </>
           )}

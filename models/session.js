@@ -1,27 +1,26 @@
 const mongoose = require("mongoose");
-const { ObjectId } = require("mongodb");
 const Schema = mongoose.Schema;
 
 const sessionSchema = new Schema(
   {
     _id: {
-      type: ObjectId,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     userId: {
-      type: ObjectId,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     expires: {
-      type: Date,
+      type: Schema.Types.Date,
       required: true,
     },
     sessionToken: {
-      type: String,
+      type: Schema.Types.String,
       required: true,
     },
     accessToken: {
-      type: String,
+      type: Schema.Types.String,
       required: true,
     },
   },
