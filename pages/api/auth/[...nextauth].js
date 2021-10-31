@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Providers from "next-auth/providers";
 import Adapters from "next-auth/adapters";
 
-import { getMongoose, updateGithubAccessToken } from "../../../lib/db";
+import { getMongoose, handleSignIn } from "../../../lib/db";
 import models from "../../../models";
 
 export default async function auth(req, res) {
@@ -23,7 +23,7 @@ export default async function auth(req, res) {
     callbacks: {
       signIn: async (user, account, profile) => {
         const mongoose = await getMongoose();
-        await updateGithubAccessToken(user.id, account.accessToken);
+        await handleSignIn(user.id, account.accessToken);
         return true;
       },
       session: async (session, token) => {

@@ -3,6 +3,27 @@ import React, { useState } from "react";
 import Modal from "react-modal";
 import Grid from "../components/Grid";
 
+// export async function getServerSideProps(context) {
+//   const dev = process.env.NODE_ENV !== "production";
+//   const server = dev ? "http://localhost:3000" : "";
+//   console.log(server + "/api/challenge/repos/");
+//   const res = await fetch(server + "/api/challenge/repos/", {
+//     method: "GET",
+//   });
+//   console.log(res);
+//   const data = await res.json();
+
+//   if (!data) {
+//     return {
+//       userRepos: [],
+//     };
+//   } else {
+//     return {
+//       userRepos: [],
+//     };
+//   }
+// }
+
 const Dashboard = () => {
   const [session] = useSession();
 
@@ -43,13 +64,26 @@ const Dashboard = () => {
     }
   };
 
-  const handleLoadReposSubmit = (e) => {
+  const handleLoadReposSubmit = async (e) => {
     e.preventDefault();
 
     let newCheckedReposObj = repos.filter((repo) =>
       checkedRepos.includes(repo.id.toString())
     );
     let newMyRepos = [...myRepos, ...newCheckedReposObj];
+
+    let result = await fetch("/api/challenge/repos/", {
+      method: "POST",
+      // mode: "cors",
+      // cache: "no-cache",
+      // credentials: "same-origin",
+      // headers: {
+      //   "Content-Type": "application/json",
+      // },
+      // redirect: "follow",
+      // referrerPolicy: "no-referrer",
+      body: JSON.stringify(newMyRepos),
+    });
 
     setMyRepos(newMyRepos);
     setTimeout(() => {
