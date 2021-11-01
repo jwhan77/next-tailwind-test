@@ -13,30 +13,26 @@ export async function getServerSideProps(context) {
   const server = dev ? "http://localhost:3000" : "";
   const res = await fetch(server + "/api/challenge/" + userId.toString());
   const data = await res.json();
-  const userReposName = data.map((r) => r.name);
 
   if (!data) {
     return {
       props: {
         userRepos: [],
-        userReposName: userReposName,
       },
     };
   } else {
     return {
       props: {
         userRepos: data,
-        userReposName: userReposName,
       },
     };
   }
 }
 
-const Dashboard = ({ userRepos, userReposName }) => {
+const Dashboard = ({ userRepos }) => {
   const [session] = useSession();
 
   const [myRepos, setMyRepos] = useState(userRepos);
-  const [myReposName, setMyReposName] = useState(userReposName);
 
   const [loadReposModalIsOpen, setLoadReposModalIsOpen] = useState(false);
   const [repos, setRepos] = useState([]);
@@ -52,9 +48,9 @@ const Dashboard = ({ userRepos, userReposName }) => {
       const response = await fetch("/api/repos");
       const data = await response.json();
 
+      const myReposName = myRepos.map((r) => r.name);
       let allRepos = [];
 
-      console.log(myReposName);
       for (let repo of data) {
         if (!myReposName.includes(repo.name)) {
           allRepos.push(repo);
