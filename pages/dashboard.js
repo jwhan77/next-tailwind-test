@@ -1,12 +1,42 @@
-import { useSession } from "next-auth/client";
+import { useSession, getSession } from "next-auth/client";
 import React, { useState } from "react";
 import Modal from "react-modal";
 import Grid from "../components/Grid";
+import { getUserId } from "../lib/db";
 
-const Dashboard = () => {
+export async function getServerSideProps(context) {
+  const req = context.req;
+  const session = await getSession({ req });
+  const userId = await getUserId(session);
+
+  const dev = process.env.NODE_ENV !== "production";
+  const server = dev ? "http://localhost:3000" : "";
+  const res = await fetch(server + "/api/challenge/" + userId.toString());
+  const data = await res.json();
+  const userReposName = data.map((r) => r.name);
+
+  if (!data) {
+    return {
+      props: {
+        userRepos: [],
+        userReposName: userReposName,
+      },
+    };
+  } else {
+    return {
+      props: {
+        userRepos: data,
+        userReposName: userReposName,
+      },
+    };
+  }
+}
+
+const Dashboard = ({ userRepos, userReposName }) => {
   const [session] = useSession();
 
-  const [myRepos, setMyRepos] = useState([]);
+  const [myRepos, setMyRepos] = useState(userRepos);
+  const [myReposName, setMyReposName] = useState(userReposName);
 
   const [loadReposModalIsOpen, setLoadReposModalIsOpen] = useState(false);
   const [repos, setRepos] = useState([]);
@@ -21,7 +51,16 @@ const Dashboard = () => {
     const fetchRepos = async () => {
       const response = await fetch("/api/repos");
       const data = await response.json();
-      setRepos(data);
+
+      let allRepos = [];
+
+      console.log(myReposName);
+      for (let repo of data) {
+        if (!myReposName.includes(repo.name)) {
+          allRepos.push(repo);
+        }
+      }
+      setRepos(allRepos);
     };
 
     fetchRepos();
@@ -43,13 +82,26 @@ const Dashboard = () => {
     }
   };
 
-  const handleLoadReposSubmit = (e) => {
+  const handleLoadReposSubmit = async (e) => {
     e.preventDefault();
 
     let newCheckedReposObj = repos.filter((repo) =>
       checkedRepos.includes(repo.id.toString())
     );
     let newMyRepos = [...myRepos, ...newCheckedReposObj];
+
+    let result = await fetch("/api/challenge/repos/", {
+      method: "POST",
+      // mode: "cors",
+      // cache: "no-cache",
+      // credentials: "same-origin",
+      // headers: {
+      //   "Content-Type": "application/json",
+      // },
+      // redirect: "follow",
+      // referrerPolicy: "no-referrer",
+      body: JSON.stringify(newMyRepos),
+    });
 
     setMyRepos(newMyRepos);
     setTimeout(() => {
@@ -68,6 +120,17 @@ const Dashboard = () => {
     return !inMyRepos;
   };
 
+  const handleDeleteRepos = async (repoId) => {
+    let newMyRepos = [...myRepos];
+    newMyRepos = newMyRepos.filter((r) => r.id !== repoId);
+    console.log(newMyRepos);
+    let result = await fetch("/api/challenge/repos/", {
+      method: "POST",
+      body: JSON.stringify(newMyRepos),
+    });
+    setMyRepos(newMyRepos);
+  };
+
   if (session) {
     return (
       <div className="w-10/12 m-auto flex flex-row">
@@ -76,7 +139,17 @@ const Dashboard = () => {
             <p>My repos</p>
             <ul>
               {myRepos.map((repo) => {
-                return <li key={repo.id}>{repo.name}</li>;
+                return (
+                  <li key={repo.id}>
+                    <span>{repo.name}</span>{" "}
+                    <span
+                      className="text-red-500 font-bold cursor-pointer"
+                      onClick={() => handleDeleteRepos(repo.id)}
+                    >
+                      x
+                    </span>
+                  </li>
+                );
               })}
             </ul>
           </div>
