@@ -9,7 +9,7 @@ export default async (req, res) => {
     const session = await getSession({ req });
     const userId = await getUserId(session);
     const filter = { userId: userId };
-    const update = { myRepos: req.body };
+    const update = { myRepos: JSON.parse(req.body) };
     const result = await Challenge.findOneAndUpdate(filter, update);
     res.status(200).json(result);
   }

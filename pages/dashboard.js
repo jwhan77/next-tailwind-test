@@ -120,6 +120,17 @@ const Dashboard = ({ userRepos, userReposName }) => {
     return !inMyRepos;
   };
 
+  const handleDeleteRepos = async (repoId) => {
+    let newMyRepos = [...myRepos];
+    newMyRepos = newMyRepos.filter((r) => r.id !== repoId);
+    console.log(newMyRepos);
+    let result = await fetch("/api/challenge/repos/", {
+      method: "POST",
+      body: JSON.stringify(newMyRepos),
+    });
+    setMyRepos(newMyRepos);
+  };
+
   if (session) {
     return (
       <div className="w-10/12 m-auto flex flex-row">
@@ -128,7 +139,17 @@ const Dashboard = ({ userRepos, userReposName }) => {
             <p>My repos</p>
             <ul>
               {myRepos.map((repo) => {
-                return <li key={repo.id}>{repo.name}</li>;
+                return (
+                  <li key={repo.id}>
+                    <span>{repo.name}</span>{" "}
+                    <span
+                      className="text-red-500 font-bold cursor-pointer"
+                      onClick={() => handleDeleteRepos(repo.id)}
+                    >
+                      x
+                    </span>
+                  </li>
+                );
               })}
             </ul>
           </div>
