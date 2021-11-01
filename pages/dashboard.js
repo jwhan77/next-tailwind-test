@@ -1,33 +1,38 @@
-import { useSession } from "next-auth/client";
+import { useSession, getSession } from "next-auth/client";
 import React, { useState } from "react";
 import Modal from "react-modal";
 import Grid from "../components/Grid";
+import { getUserId } from "../lib/db";
 
-// export async function getServerSideProps(context) {
-//   const dev = process.env.NODE_ENV !== "production";
-//   const server = dev ? "http://localhost:3000" : "";
-//   console.log(server + "/api/challenge/repos/");
-//   const res = await fetch(server + "/api/challenge/repos/", {
-//     method: "GET",
-//   });
-//   console.log(res);
-//   const data = await res.json();
+export async function getServerSideProps(context) {
+  const req = context.req;
+  const session = await getSession({ req });
+  const userId = await getUserId(session);
 
-//   if (!data) {
-//     return {
-//       userRepos: [],
-//     };
-//   } else {
-//     return {
-//       userRepos: [],
-//     };
-//   }
-// }
+  const dev = process.env.NODE_ENV !== "production";
+  const server = dev ? "http://localhost:3000" : "";
+  const res = await fetch(server + "/api/challenge/" + userId.toString());
+  const data = await res.json();
 
-const Dashboard = () => {
+  if (!data) {
+    return {
+      props: {
+        userRepos: [],
+      },
+    };
+  } else {
+    return {
+      props: {
+        userRepos: data,
+      },
+    };
+  }
+}
+
+const Dashboard = ({ userRepos }) => {
   const [session] = useSession();
 
-  const [myRepos, setMyRepos] = useState([]);
+  const [myRepos, setMyRepos] = useState(userRepos);
 
   const [loadReposModalIsOpen, setLoadReposModalIsOpen] = useState(false);
   const [repos, setRepos] = useState([]);
