@@ -33,21 +33,24 @@ export async function getServerSideProps(context) {
     return {
       props: {
         userRepos: [],
+        userDays: {},
       },
     };
   } else {
     return {
       props: {
-        userRepos: data,
+        userRepos: data.myRepos,
+        userDays: data.days,
       },
     };
   }
 }
 
-const Dashboard = ({ userRepos }) => {
+const Dashboard = ({ userRepos, userDays }) => {
   const [session] = useSession();
 
   const [myRepos, setMyRepos] = useState(userRepos);
+  const [myDays, setMyDays] = useState(userDays);
 
   const [firstDay, setFirstDay] = useState([]);
 
@@ -144,15 +147,49 @@ const Dashboard = ({ userRepos }) => {
     setMyRepos(newMyRepos);
   };
 
+  const monthDayYear = (date) => {
+    const myDate = new Date(date);
+    const [month, day, year] = [
+      MONTH[myDate.getMonth()],
+      myDate.getDate(),
+      myDate.getFullYear(),
+    ];
+    return `${month} ${day.toString()} ${year.toString()}`;
+  };
+
   const handleAutoLoadingCommits = async () => {
     const firstDayOfChallenge = (date) => {
-      const myDate = new Date(date);
-      const [month, day, year] = [
-        MONTH[myDate.getMonth()],
-        myDate.getDate(),
-        myDate.getFullYear(),
-      ];
-      setFirstDay(`${month} ${day.toString()} ${year.toString()}`);
+      setFirstDay(monthDayYear(date));
+    };
+
+    const updateDays = async (commits) => {
+      let currentDay = 1;
+      let currentDate = "";
+
+      let newMyDays = JSON.parse(JSON.stringify(myDays));
+
+      for (let i = commits.length - 1; i >= 0; i--) {
+        const date = monthDayYear(commits[i].date);
+
+        if (i === commits.length - 1) {
+          currentDate = monthDayYear(commits[i].date);
+        } else if (currentDate !== date) {
+          currentDate = date;
+          currentDay += 1;
+        }
+
+        if (!newMyDays[currentDay].updatedByUser) {
+          newMyDays[currentDay].complete = true;
+          newMyDays[currentDay].date = date;
+          newMyDays[currentDay].links = [
+            ...newMyDays[currentDay].links,
+            { msg: commits[i].message, link: commits[i].html_url },
+          ];
+        }
+      }
+
+      console.log(newMyDays);
+      setMyDays(newMyDays);
     };
 
     let commits = [];
@@ -163,7 +200,11 @@ const Dashboard = ({ userRepos }) => {
     }
     commits.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 
+    console.log(commits);
+
     firstDayOfChallenge(commits[commits.length - 1].date);
+
+    updateDays(commits);
   };
 
   if (session) {
@@ -229,7 +270,7 @@ const Dashboard = ({ userRepos }) => {
         </div>
         <div>
           <div>First day : {firstDay}</div>
-          <Grid />
+          <Grid days={myDays} />
         </div>
       </div>
     );
