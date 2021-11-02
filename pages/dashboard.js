@@ -4,6 +4,21 @@ import Modal from "react-modal";
 import Grid from "../components/Grid";
 import { getUserId } from "../lib/db";
 
+const MONTH = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
 export async function getServerSideProps(context) {
   const req = context.req;
   const session = await getSession({ req });
@@ -18,21 +33,26 @@ export async function getServerSideProps(context) {
     return {
       props: {
         userRepos: [],
+        userDays: {},
       },
     };
   } else {
     return {
       props: {
-        userRepos: data,
+        userRepos: data.myRepos,
+        userDays: data.days,
       },
     };
   }
 }
 
-const Dashboard = ({ userRepos }) => {
+const Dashboard = ({ userRepos, userDays }) => {
   const [session] = useSession();
 
   const [myRepos, setMyRepos] = useState(userRepos);
+  const [myDays, setMyDays] = useState(userDays);
+
+  const [firstDay, setFirstDay] = useState([]);
 
   const [loadReposModalIsOpen, setLoadReposModalIsOpen] = useState(false);
   const [repos, setRepos] = useState([]);
@@ -127,6 +147,66 @@ const Dashboard = ({ userRepos }) => {
     setMyRepos(newMyRepos);
   };
 
+  const monthDayYear = (date) => {
+    const myDate = new Date(date);
+    const [month, day, year] = [
+      MONTH[myDate.getMonth()],
+      myDate.getDate(),
+      myDate.getFullYear(),
+    ];
+    return `${month} ${day.toString()} ${year.toString()}`;
+  };
+
+  const handleAutoLoadingCommits = async () => {
+    const firstDayOfChallenge = (date) => {
+      setFirstDay(monthDayYear(date));
+    };
+
+    const updateDays = async (commits) => {
+      let currentDay = 1;
+      let currentDate = "";
+
+      let newMyDays = JSON.parse(JSON.stringify(myDays));
+
+      for (let i = commits.length - 1; i >= 0; i--) {
+        const date = monthDayYear(commits[i].date);
+
+        if (i === commits.length - 1) {
+          currentDate = monthDayYear(commits[i].date);
+        } else if (currentDate !== date) {
+          currentDate = date;
+          currentDay += 1;
+        }
+
+        if (!newMyDays[currentDay].updatedByUser) {
+          newMyDays[currentDay].complete = true;
+          newMyDays[currentDay].date = date;
+          newMyDays[currentDay].links = [
+            ...newMyDays[currentDay].links,
+            { msg: commits[i].message, link: commits[i].html_url },
+          ];
+        }
+      }
+
+      console.log(newMyDays);
+      setMyDays(newMyDays);
+    };
+
+    let commits = [];
+    for (let repo of myRepos) {
+      const res = await fetch(`/api/commits/${session.user.name}/${repo.name}`);
+      const data = await res.json();
+      commits = [...commits, ...data];
+    }
+    commits.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+
+    console.log(commits);
+
+    firstDayOfChallenge(commits[commits.length - 1].date);
+
+    updateDays(commits);
+  };
+
   if (session) {
     return (
       <div className="w-10/12 m-auto flex flex-row">
@@ -182,9 +262,15 @@ const Dashboard = ({ userRepos }) => {
               </form>
             </Modal>
           </div>
+          <div>
+            <div className="cursor-pointer" onClick={handleAutoLoadingCommits}>
+              Get data
+            </div>
+          </div>
         </div>
         <div>
-          <Grid />
+          <div>First day : {firstDay}</div>
+          <Grid days={myDays} />
         </div>
       </div>
     );
