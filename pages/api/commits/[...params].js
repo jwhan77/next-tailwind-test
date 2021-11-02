@@ -1,11 +1,15 @@
 const { Octokit } = require("@octokit/core");
+import { getSession } from "next-auth/client";
+const { getMongoose, getGithubAccessToken } = require("../../../lib/db");
 
 export default async (req, res) => {
   const { params } = req.query;
   const owner = params[0];
   const repo = params[1];
 
-  const githubAccessToken = process.env.GITHUB_ACCESSTOKEN;
+  const session = await getSession({ req });
+  const mongoose = await getMongoose();
+  const githubAccessToken = await getGithubAccessToken(req);
 
   const octokit = new Octokit({ auth: githubAccessToken });
   const { data } = await octokit.request("GET /repos/{owner}/{repo}/commits", {

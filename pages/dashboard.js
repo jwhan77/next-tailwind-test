@@ -127,6 +127,16 @@ const Dashboard = ({ userRepos }) => {
     setMyRepos(newMyRepos);
   };
 
+  const handleAutoLoadingCommits = async () => {
+    let commits = [];
+    for (let repo of myRepos) {
+      const res = await fetch(`/api/commits/${session.user.name}/${repo.name}`);
+      const data = await res.json();
+      commits = [...commits, ...data];
+    }
+    commits.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+  };
+
   if (session) {
     return (
       <div className="w-10/12 m-auto flex flex-row">
@@ -181,6 +191,11 @@ const Dashboard = ({ userRepos }) => {
                 <input type="submit" value="Submit" />
               </form>
             </Modal>
+          </div>
+          <div>
+            <div className="cursor-pointer" onClick={handleAutoLoadingCommits}>
+              Get data
+            </div>
           </div>
         </div>
         <div>
