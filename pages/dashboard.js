@@ -4,6 +4,21 @@ import Modal from "react-modal";
 import Grid from "../components/Grid";
 import { getUserId } from "../lib/db";
 
+const MONTH = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
 export async function getServerSideProps(context) {
   const req = context.req;
   const session = await getSession({ req });
@@ -33,6 +48,8 @@ const Dashboard = ({ userRepos }) => {
   const [session] = useSession();
 
   const [myRepos, setMyRepos] = useState(userRepos);
+
+  const [firstDay, setFirstDay] = useState([]);
 
   const [loadReposModalIsOpen, setLoadReposModalIsOpen] = useState(false);
   const [repos, setRepos] = useState([]);
@@ -128,6 +145,16 @@ const Dashboard = ({ userRepos }) => {
   };
 
   const handleAutoLoadingCommits = async () => {
+    const firstDayOfChallenge = (date) => {
+      const myDate = new Date(date);
+      const [month, day, year] = [
+        MONTH[myDate.getMonth()],
+        myDate.getDate(),
+        myDate.getFullYear(),
+      ];
+      setFirstDay(`${month} ${day.toString()} ${year.toString()}`);
+    };
+
     let commits = [];
     for (let repo of myRepos) {
       const res = await fetch(`/api/commits/${session.user.name}/${repo.name}`);
@@ -135,6 +162,8 @@ const Dashboard = ({ userRepos }) => {
       commits = [...commits, ...data];
     }
     commits.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+
+    firstDayOfChallenge(commits[commits.length - 1].date);
   };
 
   if (session) {
@@ -199,6 +228,7 @@ const Dashboard = ({ userRepos }) => {
           </div>
         </div>
         <div>
+          <div>First day : {firstDay}</div>
           <Grid />
         </div>
       </div>
