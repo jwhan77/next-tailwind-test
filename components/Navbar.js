@@ -39,28 +39,37 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex">
-      <div className="w-4/5"></div>
-      <div className="w-1/5 flex justify-end">
-        <div className="flex items-center justify-center text-black dark:text-white">
+    <nav className="flex p-6 bg-gray-200 text-gray-700">
+      <div className="w-2/3">
+        <div className="font-bold text-xl">
+          <p>#100DaysOfCode</p>
+          <p>Challenge tracking</p>
+        </div>
+      </div>
+      <div className="w-1/3 flex justify-end">
+        <div className="flex items-center justify-center dark:text-white">
           {!session && (
             <>
-              <button onClick={() => signIn("github")}>Sign in</button>
+              <button
+                className="font-semibold"
+                onClick={() => signIn("github")}
+              >
+                Sign in
+              </button>
             </>
           )}
           {session && (
             <>
-              <span>{session.user && session.user.name}</span>
-              <button onClick={() => signOut()}>Sign out</button>
+              <span
+                onClick={() => signOut()}
+                className="font-semibold cursor-pointer"
+              >
+                {session.user && session.user.name}
+              </span>
+              {/* <button onClick={() => signOut()}>Sign out</button> */}
             </>
           )}
         </div>
-        <ToggleSwitch
-          toggle={darkMode}
-          onClick={toggleDarkMode}
-          msg={"🌙"}
-          className="m-4"
-        />
       </div>
     </nav>
   );
