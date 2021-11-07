@@ -15,7 +15,13 @@ export default function Home() {
   }
   return (
     <>
-      <div>Please sign in</div>
+      <div className="h-4/5 flex">
+        <img
+          className="w-3/4 h-3/4 sm:w-1/2 sm:h-1/2 block m-auto"
+          src="/developer_activity.svg"
+          alt="activity"
+        />
+      </div>
     </>
   );
 }
