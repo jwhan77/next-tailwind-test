@@ -22,7 +22,22 @@ const Navbar = () => {
       }
     }
 
+    function setupDropdownToggle() {
+      const nextElement = document.getElementById("__next");
+      nextElement.addEventListener("click", (e) => {
+        e.preventDefault();
+        const dropdownElement = document.getElementById("user-dropdown");
+        if (
+          ((e.target.id && e.target.id !== "username") || !e.target.id) &&
+          !dropdownElement.classList.contains("hidden")
+        ) {
+          dropdownElement.classList.add("hidden");
+        }
+      });
+    }
+
     setupMode();
+    setupDropdownToggle();
 
     return () => {};
   }, []);
@@ -36,6 +51,15 @@ const Navbar = () => {
       document.documentElement.classList.add("dark");
     }
     setDarkMode(!darkMode);
+  };
+
+  const toggleDropdown = () => {
+    const dropdownElement = document.getElementById("user-dropdown");
+    if (dropdownElement.classList.contains("hidden")) {
+      dropdownElement.classList.remove("hidden");
+    } else {
+      dropdownElement.classList.add("hidden");
+    }
   };
 
   return (
@@ -61,12 +85,31 @@ const Navbar = () => {
           {session && (
             <>
               <span
-                onClick={() => signOut()}
+                id="username"
                 className="font-semibold cursor-pointer"
+                onClick={toggleDropdown}
               >
                 {session.user && session.user.name}
               </span>
-              {/* <button onClick={() => signOut()}>Sign out</button> */}
+              <div className="w-8"></div>
+              <div
+                id="user-dropdown"
+                className="absolute border-gray-300 border rounded-xl bg-gray-200 w-36 -mb-40 right-5 p-2 hidden"
+              >
+                <ToggleSwitch
+                  toggle={darkMode}
+                  onClick={toggleDarkMode}
+                  msg={"🌙"}
+                  className="m-4"
+                />
+                <hr className="h-0.5 bg-gray-300" />
+                <div
+                  onClick={() => signOut()}
+                  className="text-center mt-3 mb-1 cursor-pointer"
+                >
+                  Sign out
+                </div>
+              </div>
             </>
           )}
         </div>
