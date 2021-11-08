@@ -211,7 +211,7 @@ const Dashboard = ({ userRepos, userDays }) => {
     return (
       <div className="w-screen h-screen m-auto flex flex-col content-center">
         <div className="flex flex-row pt-28 h-full">
-          <div className="w-3/12 p-8 bg-gray-300">
+          <div className="w-3/12 p-8 bg-gray-300 overflow-auto border-r border-gray-400">
             <div>
               <div>
                 <div className="flex justify-between">
@@ -248,16 +248,16 @@ const Dashboard = ({ userRepos, userDays }) => {
                   contentLabel="Load Repos"
                   ariaHideApp={false}
                 >
-                  <h2>Repos in GitHub</h2>
-                  <button onClick={closeLoadReposModal}>close</button>
-                  <form onSubmit={handleLoadReposSubmit}>
+                  <button onClick={closeLoadReposModal}>x</button>
+                  <form className="px-8 py-4" onSubmit={handleLoadReposSubmit}>
                     {repos
                       .filter((repo) => checkRepoIsInMyRepos(repo))
                       .map((repo) => {
                         return (
-                          <div key={repo.id}>
+                          <div key={repo.id} className="mb-1">
                             <label>
                               <input
+                                className="mr-2"
                                 name={repo.name}
                                 value={repo.id}
                                 type="checkbox"
@@ -268,7 +268,13 @@ const Dashboard = ({ userRepos, userDays }) => {
                           </div>
                         );
                       })}
-                    <input type="submit" value="Submit" />
+                    <div className="flex flex-col items-end">
+                      <input
+                        className="px-2 py-1 rounded-md mt-4 cursor-pointer"
+                        type="submit"
+                        value="Submit"
+                      />
+                    </div>
                   </form>
                 </Modal>
               </div>

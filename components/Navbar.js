@@ -67,7 +67,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex p-6 bg-gray-200 text-gray-700 fixed w-screen h-28">
+    <nav className="flex p-6 bg-gray-200 text-gray-700 fixed w-screen h-28 border-b border-gray-400">
       <div className="w-2/3">
         <div className="font-bold text-xl">
           <p>#100DaysOfCode</p>
