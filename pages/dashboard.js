@@ -209,68 +209,81 @@ const Dashboard = ({ userRepos, userDays }) => {
 
   if (session) {
     return (
-      <div className="w-10/12 m-auto flex flex-row">
-        <div className="w-4/12">
-          <div>
-            <p>My repos</p>
-            <ul>
-              {myRepos.map((repo) => {
-                return (
-                  <li key={repo.id}>
-                    <span>{repo.name}</span>{" "}
-                    <span
-                      className="text-red-500 font-bold cursor-pointer"
-                      onClick={() => handleDeleteRepos(repo.id)}
+      <div className="w-screen h-screen m-auto flex flex-col content-center">
+        <div className="flex flex-row pt-28 h-full">
+          <div className="w-3/12 p-8 bg-gray-300">
+            <div>
+              <div>
+                <div className="flex justify-between">
+                  <div className="text-xl">Repositories</div>
+                  <div className="">
+                    <button
+                      className="bg-gray-600 px-2 py-1 rounded-lg text-white"
+                      onClick={openLoadReposModal}
                     >
-                      x
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          <div>
-            <button onClick={openLoadReposModal}>Load repos</button>
-            <Modal
-              isOpen={loadReposModalIsOpen}
-              onRequestClose={closeLoadReposModal}
-              contentLabel="Load Repos"
-              ariaHideApp={false}
-            >
-              <h2>Repos in GitHub</h2>
-              <button onClick={closeLoadReposModal}>close</button>
-              <form onSubmit={handleLoadReposSubmit}>
-                {repos
-                  .filter((repo) => checkRepoIsInMyRepos(repo))
-                  .map((repo) => {
-                    return (
-                      <div key={repo.id}>
-                        <label>
-                          <input
-                            name={repo.name}
-                            value={repo.id}
-                            type="checkbox"
-                            onChange={handleCheckRepoChange}
-                          ></input>
-                          {repo.name}
-                        </label>
-                      </div>
-                    );
-                  })}
-                <input type="submit" value="Submit" />
-              </form>
-            </Modal>
-          </div>
-          <div>
-            <div className="cursor-pointer" onClick={handleAutoLoadingCommits}>
-              Get data
+                      Load
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <ul>
+                    {myRepos.map((repo) => {
+                      return (
+                        <li key={repo.id}>
+                          <span>{repo.name}</span>{" "}
+                          <span
+                            className="text-red-500 font-bold cursor-pointer"
+                            onClick={() => handleDeleteRepos(repo.id)}
+                          >
+                            x
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+                <Modal
+                  isOpen={loadReposModalIsOpen}
+                  onRequestClose={closeLoadReposModal}
+                  contentLabel="Load Repos"
+                  ariaHideApp={false}
+                >
+                  <h2>Repos in GitHub</h2>
+                  <button onClick={closeLoadReposModal}>close</button>
+                  <form onSubmit={handleLoadReposSubmit}>
+                    {repos
+                      .filter((repo) => checkRepoIsInMyRepos(repo))
+                      .map((repo) => {
+                        return (
+                          <div key={repo.id}>
+                            <label>
+                              <input
+                                name={repo.name}
+                                value={repo.id}
+                                type="checkbox"
+                                onChange={handleCheckRepoChange}
+                              ></input>
+                              {repo.name}
+                            </label>
+                          </div>
+                        );
+                      })}
+                    <input type="submit" value="Submit" />
+                  </form>
+                </Modal>
+              </div>
             </div>
           </div>
-        </div>
-        <div>
-          <div>First day : {firstDay}</div>
-          <Grid days={myDays} />
+          <div className="w-1/2 pt-12">
+            <Grid days={myDays} />
+            <div
+              className="cursor-pointer text-right text-gray-600 underline"
+              onClick={handleAutoLoadingCommits}
+            >
+              Autofill
+            </div>
+          </div>
+          <div className="w-3/12"></div>
         </div>
       </div>
     );

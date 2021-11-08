@@ -26,12 +26,16 @@ const Navbar = () => {
       const nextElement = document.getElementById("__next");
       nextElement.addEventListener("click", (e) => {
         e.preventDefault();
-        const dropdownElement = document.getElementById("user-dropdown");
-        if (
-          ((e.target.id && e.target.id !== "username") || !e.target.id) &&
-          !dropdownElement.classList.contains("hidden")
-        ) {
-          dropdownElement.classList.add("hidden");
+        try {
+          const dropdownElement = document.getElementById("user-dropdown");
+          if (
+            ((e.target.id && e.target.id !== "username") || !e.target.id) &&
+            !dropdownElement.classList.contains("hidden")
+          ) {
+            dropdownElement.classList.add("hidden");
+          }
+        } catch (e) {
+          console.log(e);
         }
       });
     }
@@ -63,7 +67,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex p-6 bg-gray-200 text-gray-700">
+    <nav className="flex p-6 bg-gray-200 text-gray-700 fixed w-screen h-28">
       <div className="w-2/3">
         <div className="font-bold text-xl">
           <p>#100DaysOfCode</p>
